@@ -4,10 +4,10 @@ interface Props {
   nombre: string;
   id: string;
 }
-const { imagen, nombre } = Astro.props;
+const { imagen, nombre, id } = Astro.props;
 ---
 
-<a href={`/bebida/${nombre}`} class="bebida">
+<a href={`/bebida/${id}`} class="bebida">
   <div
     class="rounded border border-zinc-400 flex flex-col gap-2 items-center justify-between p-5 overflow-hidden h-72"
   >
