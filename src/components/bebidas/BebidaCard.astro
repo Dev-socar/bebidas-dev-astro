@@ -1,0 +1,26 @@
+---
+interface Props {
+  imagen: string;
+  nombre: string;
+  id: string;
+}
+const { imagen, nombre } = Astro.props;
+---
+
+<a href={`/bebida/${nombre}`} class="bebida">
+  <div
+    class="rounded border border-zinc-400 flex flex-col gap-2 items-center justify-between p-5 overflow-hidden h-72"
+  >
+    <img src={imagen} alt=`Imagen de la Bebida ${nombre}` transition:name={`${nombre}-image`}/>
+    <h2 class="text-xl text-zinc-300 text-center">{nombre}</h2>
+  </div>
+</a>
+
+<style>
+  .bebida:hover div {
+    background-color: #a1a1aa4f;
+  }
+  div {
+    transition: all .3s ease;
+  }
+</style>

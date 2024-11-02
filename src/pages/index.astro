@@ -1,16 +1,99 @@
 ---
+import type { BebidasInterface } from "../interfaces/bebidas.response";
+import LayoutPrincipal from "../Layouts/LayoutPrincipal.astro";
+import BebidaCard from "../components/bebidas/BebidaCard.astro";
 
+const response = await fetch(
+  "https://www.thecocktaildb.com/api/json/v1/1/filter.php?a=Non_Alcoholic"
+);
+const { drinks } = (await response.json()) as BebidasInterface;
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<LayoutPrincipal>
+  <section class="w-full mt-10 relative" data-aos="fade-down">
+    <img
+      src="images/bar.webp"
+      alt="Imagen de banner"
+      class="w-full h-full block object-cover"
+    />
+    <div
+      class="lg:w-1/2 h-full absolute top-0 left-0 bg-orange-500 bg-opacity-80 p-5 rounded"
+    >
+      <div class="flex justify-center flex-col h-full gap-3">
+        <h2 class="text-4xl">Recetas de Bebidas</h2>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat,
+          mollitia omnis amet cumque, quidem vitae excepturi natus earum eveniet
+          maxime architecto reprehenderit placeat libero nihil ipsam magnam quis
+          ad perferendis.
+        </p>
+        <a
+          class="border rounded p-2 text-orange-500 uppercase font-semibold w-max bg-white hover:bg-orange-600 hover:text-white transition-colors"
+          href="/bebidas">Catalogo de Bebidas</a
+        >
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-20" data-aos="fade-up">
+    <h2 class="text-4xl text-center">Contamos con</h2>
+    <hr class="line" />
+    <ul class="grid gap-5 lg:grid-cols-3">
+      <li class="flex flex-col items-center gap-6">
+        <img
+          class="size-64 object-cover rounded-[50%]"
+          src="images/servicios-01.webp"
+          alt="Imagen del servicio 1"
+        />
+        <h3 class="text-2xl font-bold">Variedad de Bebidas</h3>
+        <p class="text-center">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Excepturi
+          adipisci aspernatur possimus cum saepe ducimus veritatis voluptatem
+          similique esse repellat.
+        </p>
+      </li>
+      <li class="flex flex-col items-center gap-6">
+        <img
+          class="size-64 object-cover rounded-[50%]"
+          src="images/servicios-02.jpg"
+          alt="Imagen del servicio 1"
+        />
+        <h3 class="text-2xl font-bold">Exclusividad</h3>
+        <p class="text-center">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Excepturi
+          adipisci aspernatur possimus cum saepe ducimus veritatis voluptatem
+          similique esse repellat.
+        </p>
+      </li>
+      <li class="flex flex-col items-center gap-6">
+        <img
+          class="size-64 object-cover rounded-[50%]"
+          src="images/servicios-03.webp"
+          alt="Imagen del servicio 1"
+        />
+        <h3 class="text-2xl font-bold">Buenos Momentos</h3>
+        <p class="text-center">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Excepturi
+          adipisci aspernatur possimus cum saepe ducimus veritatis voluptatem
+          similique esse repellat.
+        </p>
+      </li>
+    </ul>
+  </section>
+
+  <section class="mt-20" data-aos="fade-up">
+    <h2 class="text-4xl text-center">Bebidas Sin Alcohol</h2>
+    <hr class="line" />
+    <div class="grid md:grid-cols-4 gap-5 mt-5">
+      {
+        drinks
+          ?.slice(0, 12)
+          .map(({ strDrinkThumb, strDrink, idDrink }) => (
+            <BebidaCard imagen={strDrinkThumb} nombre={strDrink} id={idDrink} />
+          ))
+      }
+    </div>
+  </section>
+</LayoutPrincipal>
+
+

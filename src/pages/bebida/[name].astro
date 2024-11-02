@@ -1,0 +1,108 @@
+---
+import type { GetStaticPaths } from "astro";
+import type {
+  BebidasInterface,
+  Drink,
+  IngredientMeasure,
+} from "../../interfaces/bebidas.response";
+import LayoutPrincipal from "../../Layouts/LayoutPrincipal.astro";
+
+export const getStaticPaths = (async () => {
+  try {
+    const [alcoholicResp, nonAlcoholicResp] = await Promise.all([
+      fetch(
+        "https://www.thecocktaildb.com/api/json/v1/1/filter.php?a=Alcoholic"
+      ).then((resp) => resp.json()),
+      fetch(
+        "https://www.thecocktaildb.com/api/json/v1/1/filter.php?a=Non_Alcoholic"
+      ).then((resp) => resp.json()),
+    ]);
+
+    // Combina ambas listas de bebidas en una sola
+    const drinks = [
+      ...(alcoholicResp.drinks || []),
+      ...(nonAlcoholicResp.drinks || []),
+    ];
+
+    // Filtra los drinks que no tengan strDrink
+    const paths = drinks
+      .filter((drink) => drink.strDrink)
+      .map(({ strDrink, strDrinkThumb, idDrink }) => ({
+        params: { name: strDrink },
+        props: { idDrink, strDrinkThumb },
+      }));
+
+    console.log(paths); // Log para verificar las rutas generadas
+    return paths;
+  } catch (error) {
+    console.error("Error fetching drink data:", error);
+    return [];
+  }
+}) satisfies GetStaticPaths;
+
+// Obtén los parámetros y props de Astro
+const { name } = Astro.params;
+const { strDrinkThumb } = Astro.props;
+
+let bebida: Drink | null = null;
+try {
+  const resp = await fetch(
+    `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${name}`
+  );
+  const { drinks } = (await resp.json()) as BebidasInterface;
+  bebida = drinks && drinks.length > 0 ? drinks[0] : null; // Asegúrate de que haya al menos una bebida
+} catch (error) {
+  console.error("Error fetching drink details:", error);
+}
+
+// Función para mapear ingredientes y medidas sin valores nulos
+const mapearIngredientes = (b: Drink): IngredientMeasure[] => {
+  return Array.from({ length: 15 }, (_, i) => i + 1)
+    .map((i) => {
+      const ingredient = b[`strIngredient${i}`];
+      const measure = b[`strMeasure${i}`] || "";
+      return ingredient ? { ingredient, measure } : null;
+    })
+    .filter((item): item is IngredientMeasure => item !== null);
+};
+
+const ingredientes = bebida ? mapearIngredientes(bebida) : [];
+---
+
+<LayoutPrincipal
+  title={name}
+  description={`Receta para preparar ${name}`}
+  image={strDrinkThumb}
+>
+  <main class="grid lg:grid-cols-2 gap-5 items-center">
+    <div>
+      <h2 class="text-3xl">{name}</h2>
+      <span class="text-gray-500 text-xl font-semibold">
+        {bebida?.strCategory || "Categoría desconocida"}
+      </span>
+
+      <img
+        src={strDrinkThumb}
+        transition:name={`${name}-image`}
+        class="mt-5 rounded"
+        alt={`Imagen de la bebida ${name}`}
+      />
+    </div>
+    <div>
+      <p class="text-xl">Instrucciones</p>
+      <p class="mb-4 text-lg mt-1">
+        {bebida?.strInstructions || "No hay instrucciones disponibles."}
+      </p>
+      <p class="text-xl">Ingredientes</p>
+      <div class="space-y-2 mt-1">
+        {
+          ingredientes.map(({ ingredient, measure }) => (
+            <p class="text-lg">
+              ▶️ {ingredient} - {measure}
+            </p>
+          ))
+        }
+      </div>
+    </div>
+  </main>
+</LayoutPrincipal>

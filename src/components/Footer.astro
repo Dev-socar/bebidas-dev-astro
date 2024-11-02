@@ -1,0 +1,20 @@
+---
+import Header from "./Header.astro";
+---
+
+<footer class="p-5 bg-slate-800 flex flex-col items-center gap-10">
+  <Header />
+  <div>
+    <p class="text-center text-sm lg:text-base">
+      Copyright &copy; <span>2024</span> Todos los derechos reservados - Bebidas
+      Dev 🍹
+    </p>
+  </div>
+</footer>
+
+<script>
+  const currentYear = new Date().getFullYear();
+  const spanYear = document.querySelector("span") as HTMLSpanElement;
+
+  spanYear.textContent = currentYear.toString();
+</script>

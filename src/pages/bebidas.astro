@@ -1,0 +1,45 @@
+---
+import BebidaCard from "../components/bebidas/BebidaCard.astro";
+import LayoutPrincipal from "../Layouts/LayoutPrincipal.astro";
+import type { BebidasInterface } from "../interfaces/bebidas.response";
+
+// Llama a los dos endpoints en paralelo y combina las respuestas
+async function obtenerDatosCombinados() {
+  try {
+    const [respuesta1, respuesta2] = await Promise.all([
+      fetch(
+        "https://www.thecocktaildb.com/api/json/v1/1/filter.php?a=Alcoholic"
+      ).then((resp) => resp.json()),
+      fetch(
+        "https://www.thecocktaildb.com/api/json/v1/1/filter.php?a=Non_Alcoholic"
+      ).then((resp) => resp.json()),
+    ]);
+
+    const bebidas = {
+      ...respuesta1,
+      ...respuesta2,
+    };
+
+    return bebidas;
+  } catch (error) {
+    console.error("Error al obtener datos combinados:", error);
+    return null;
+  }
+}
+
+const { drinks } = await obtenerDatosCombinados() as BebidasInterface;
+---
+
+<LayoutPrincipal title="Bebidas">
+  <section class="mt-5" data-aos="fade-up">
+    <h2 class="text-4xl text-center">Nuestras Bebidas</h2>
+    <hr class="line" />
+    <div class="grid md:grid-cols-4 gap-5 mt-5">
+      {
+        drinks?.map(({ strDrinkThumb, strDrink, idDrink }) => (
+          <BebidaCard imagen={strDrinkThumb} nombre={strDrink} id={idDrink} />
+        ))
+      }
+    </div>
+  </section>
+</LayoutPrincipal>
